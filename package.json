@@ -1,0 +1,17 @@
+{
+    "version": "2.0.0",
+    "name": "cordova-plugin-brightcoveplayer",
+    "cordova_name": "BrightcovePlayerPlugin",
+    "description": "Brightcove Native Player for Cordova",
+    "license": "Apache 2.0",
+    "keywords": [
+        "Cordova",
+        "Brightcove",
+        "Player"
+    ],
+    "platforms": [
+        "android",
+        "ios"
+    ],
+    "engines": []
+}
