@@ -5,6 +5,7 @@ import android.content.BroadcastReceiver;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.res.Resources;
+import android.graphics.Rect;
 import android.net.Uri;
 import android.os.Bundle;
 import android.util.Log;
@@ -66,15 +67,39 @@ public class BCPlayerActivity extends BrightcovePlayer {
   private ActivityReceiver activityReceiver;
   private int layoutX, layoutY, layoutWidth, layoutHeight;
   private String token = null;
+  private String restart = null;
 
   private class ActivityReceiver extends BroadcastReceiver {
     @Override
     public void onReceive(Context arg0, Intent arg1) {
+      Video video = null;
       Cmd cmd = Cmd.valueOf(arg1.getStringExtra("EXTRA_CMD"));
       switch (cmd){
         case LOAD:
           String rid = arg1.getStringExtra("EXTRA_DATA1");
-          load(token, rid);
+          video = BCVideoRetriever.retrieveVideo(token, rid);
+          if(video != null){
+            addVideoToViewer(video);
+          }
+          break;
+        case LOADED:
+          video = BCVideoRetriever.getVideo();
+          if(video != null){
+            Intent intent = new Intent();
+            intent.setAction(ACTIVITY_EVENT);
+            String duration = Integer.toString(video.getDuration() / 1000);
+            intent.putExtra("DATA_BACK", "brightcovePlayer.loaded");
+            intent.putExtra("DURATION", duration);
+            sendBroadcast(intent);
+            addVideoToViewer(video);
+          }
+          break;
+        case DISABLE:
+          unregisterReceiver(activityReceiver);
+          brightcoveVideoView.getLayoutParams();
+          finish();
+          break;
+        case ENABLE:
           break;
         case PAUSE:
           if(brightcoveVideoView != null){
@@ -110,6 +135,7 @@ public class BCPlayerActivity extends BrightcovePlayer {
           layoutWidth = width;
           layoutHeight = height;
           reposition(x, layoutY, width, height);
+          BCVideoRetriever.setRect(y, x, height, width);
           break;
       }
     }
@@ -125,6 +151,7 @@ public class BCPlayerActivity extends BrightcovePlayer {
 
       WindowManager.LayoutParams lp = (WindowManager.LayoutParams) view.getLayoutParams();
 
+      Rect rect;
       lp.gravity = Gravity.TOP;
       lp.x = toPixels(context, x);
       lp.y = toPixels(context, y);
@@ -159,6 +186,7 @@ public class BCPlayerActivity extends BrightcovePlayer {
 
     Intent intent = getIntent();
     token = intent.getStringExtra("brightcove-token");
+    restart = intent.getStringExtra("brightcove-restart");
 
     eventEmitter = brightcoveVideoView.getEventEmitter();
     eventEmitter.on(EventType.DID_ENTER_FULL_SCREEN, new EventListener() {
@@ -216,7 +244,9 @@ public class BCPlayerActivity extends BrightcovePlayer {
       public void processEvent(Event event) {
         Intent intent = new Intent();
         intent.setAction(ACTIVITY_EVENT);
-        String position = Integer.toString(brightcoveVideoView.getCurrentPosition() / 1000);
+        int pos = brightcoveVideoView.getCurrentPosition() / 1000;
+        BCVideoRetriever.setLastLocation(pos);
+        String position = Integer.toString(pos);
         intent.putExtra("DATA_BACK", "brightcovePlayer.progress");
         intent.putExtra("POSITION", position);
         sendBroadcast(intent);
@@ -239,7 +269,29 @@ public class BCPlayerActivity extends BrightcovePlayer {
       }
     });
 
-    sendEvent("brightcovePlayer.inited");
+    if(restart.compareToIgnoreCase("yes") == 0){
+      String rid = intent.getStringExtra("brightcove-rid");
+      Video video = BCVideoRetriever.retrieveVideo(token, rid);
+      if(video != null){
+        addVideoToViewer(video);
+        Integer location = BCVideoRetriever.getLastLocation();
+        brightcoveVideoView.seekTo(location * 1000);
+        /*
+        final Rect rect = BCVideoRetriever.getRect();
+        Timer myTimer = new Timer();
+        myTimer.schedule(new TimerTask() {
+          @Override
+          public void run() {
+            //reposition(rect.left, rect.top, rect.right, rect.bottom);
+            this.cancel();
+          }
+        }, 0, 1000);
+        */
+      }
+    } else {
+      sendEvent("brightcovePlayer.inited");
+    }
+
     Log.d(TAG, "Inited");
 
     return;
@@ -255,11 +307,21 @@ public class BCPlayerActivity extends BrightcovePlayer {
     DisplayMetrics metrics = new DisplayMetrics();
     getWindowManager().getDefaultDisplay().getMetrics(metrics);
 
+    final Rect rect = BCVideoRetriever.getRect();
+
     lp.gravity = Gravity.TOP;
-    lp.x = toPixels(context, 0);
-    lp.y = toPixels(context, 64);
-    lp.width = toPixels(context, 1);
-    lp.height = toPixels(context, 1);
+    if(restart.compareToIgnoreCase("yes") == 0) {
+      lp.x = toPixels(context, 0);
+      lp.y = toPixels(context, rect.top);
+      lp.width = toPixels(context, rect.right);
+      lp.height = toPixels(context, rect.bottom);
+    }
+    else{
+      lp.x = toPixels(context, 0);
+      lp.y = toPixels(context, rect.top);
+      lp.width = toPixels(context, 1);
+      lp.height = toPixels(context, 1);
+    }
     getWindowManager().updateViewLayout(view, lp);
 
     view.setBackgroundColor(Color.BLACK);
@@ -290,12 +352,26 @@ public class BCPlayerActivity extends BrightcovePlayer {
     super.onDestroy();
   }
 
+  /*
+  public void finishActivity(){
+    finish();
+  }
+  */
+
   private int getIdFromResources(String what, String where){
     String package_name = getApplication().getPackageName();
     Resources resources = getApplication().getResources();
     return resources.getIdentifier(what, where, package_name);
   }
 
+  private void addVideoToViewer(Video video) {
+    brightcoveVideoView.clear();
+    brightcoveVideoView.add(video);
+    brightcoveVideoView.start();
+    return;
+  }
+
+  /*
   private void load(String token, String rid) {
     Log.d(TAG, "Playing video from brightcove ID: " + rid);
 
@@ -312,20 +388,6 @@ public class BCPlayerActivity extends BrightcovePlayer {
         intent.putExtra("DATA_BACK", "brightcovePlayer.loaded");
         intent.putExtra("DURATION", duration);
         sendBroadcast(intent);
-
-        /*
-        Timer myTimer = new Timer();
-        myTimer.schedule(new TimerTask() {
-          @Override
-          public void run() {
-            //hideActivity();
-            //brightcoveVideoView.pause();
-
-            //brightcoveVideoView.seekTo(200000);
-            //this.cancel();
-          }
-        }, 0, 5000);
-        */
       }
 
       public void onError(String error) {
@@ -336,6 +398,7 @@ public class BCPlayerActivity extends BrightcovePlayer {
 
     return;
   }
+  */
 
   private void sendEvent(String event) {
     Intent intent = new Intent();

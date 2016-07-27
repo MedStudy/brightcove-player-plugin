@@ -21,10 +21,14 @@ import android.util.Patterns;
 import android.os.Message;
 import android.os.Messenger;
 import android.view.View;
+import android.content.ComponentName;
+import android.content.pm.PackageManager;
 
 public class BCPlayerPlugin extends CordovaPlugin {
   private CordovaWebView appView;
   private PluginReceiver receiver;
+  private String token = "";
+  private String rid = null;
 
   static final String PLUGIN_CMD = "PLUGIN_CMD";
 
@@ -36,16 +40,30 @@ public class BCPlayerPlugin extends CordovaPlugin {
     IntentFilter intentFilter = new IntentFilter();
     intentFilter.addAction(BCPlayerActivity.ACTIVITY_EVENT);
     cordova.getActivity().getApplicationContext().registerReceiver(receiver, intentFilter);
+    BCVideoRetriever.setContext(appView.getView().getContext());
   }
 
   @Override
   public boolean execute(String action, JSONArray args, CallbackContext callbackContext) throws JSONException {
     if(action.equals("init")) {
-      String token = args.getString(0);
-      this.init(token, callbackContext);
+      Context context = this.cordova.getActivity().getApplicationContext();
+      //enableComponent(context, BCPlayerActivity.class, true);
+      token = args.getString(0);
+      this.init(callbackContext, "no");
+      return true;
+    } else if (action.equals("enable")) {
+      this.init(callbackContext, "yes");
+      //sendCommand(Cmd.ENABLE, "", "", "", "");
+      //Context context = this.cordova.getActivity().getApplicationContext();
+      //enableComponent(context, BCPlayerActivity.class, true);
+      return true;
+    } else if (action.equals("disable")) {
+      sendCommand(Cmd.DISABLE, "", "", "", "");
+      //Context context = this.cordova.getActivity().getApplicationContext();
+      //enableComponent(context, BCPlayerActivity.class, false);
       return true;
     } else if (action.equals("load")) {
-      String rid = args.getString(0);
+      rid = args.getString(0);
       sendCommand(Cmd.LOAD, rid, "", "", "");
       return true;
     } else if (action.equals("hide")) {
@@ -88,11 +106,22 @@ public class BCPlayerPlugin extends CordovaPlugin {
     appView.getView().getContext().sendBroadcast(intent);
   }
 
-  private void init(String token, CallbackContext callbackContext) {
+  private void enableComponent(Context context, Class<?> componentClass,
+                               boolean isEnable) {
+    int enableFlag = isEnable ? PackageManager.COMPONENT_ENABLED_STATE_ENABLED :
+            PackageManager.COMPONENT_ENABLED_STATE_DISABLED;
+    context.getPackageManager().setComponentEnabledSetting(
+            new ComponentName(context, componentClass),
+            enableFlag, PackageManager.DONT_KILL_APP);
+  }
+
+  private void init(CallbackContext callbackContext, String restart) {
     if (token != null && token.length() > 0){
       Context context = this.cordova.getActivity().getApplicationContext();
       Intent intent = new Intent(context, BCPlayerActivity.class);
       intent.putExtra("brightcove-token", token);
+      intent.putExtra("brightcove-restart", restart);
+      intent.putExtra("brightcove-rid", rid);
       intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
       context.startActivity(intent);
 

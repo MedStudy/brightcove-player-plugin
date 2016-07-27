@@ -1,3 +1,4 @@
+cordova.define("cordova-plugin-bcplayer.player", function(require, exports, module) {
 var exec = require('cordova/exec');
 
     var BrightcovePlayerPlugin = function() {
@@ -21,6 +22,26 @@ var exec = require('cordova/exec');
         "load",
         [id ? id.toString() : null]
       );
+    };
+
+    BrightcovePlayerPlugin.enable = function() {
+        exec(
+            successHandler,
+            errorHandler,
+            "BCPlayerPlugin",
+            "enable",
+            []
+        );
+    };
+
+    BrightcovePlayerPlugin.disable = function() {
+        exec(
+            successHandler,
+            errorHandler,
+            "BCPlayerPlugin",
+            "disable",
+            []
+        );
     };
 
     BrightcovePlayerPlugin.hide = function() {
@@ -102,3 +123,5 @@ var exec = require('cordova/exec');
     }
 
 module.exports = BrightcovePlayerPlugin;
+
+});

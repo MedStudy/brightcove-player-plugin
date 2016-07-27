@@ -5,6 +5,9 @@ package net.nopattern.cordova.brightcoveplayer;
  */
 public enum Cmd {
     LOAD,
+    LOADED,
+    DISABLE,
+    ENABLE,
     PAUSE,
     PLAY,
     HIDE,
