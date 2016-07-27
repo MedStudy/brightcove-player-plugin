@@ -40,6 +40,7 @@
     <source-file src="src/android/BCPlayerPlugin.java" target-dir="src/net/nopattern/cordova/brightcoveplayer" />
     <source-file src="src/android/BCPlayerActivity.java" target-dir="src/net/nopattern/cordova/brightcoveplayer" />
     <source-file src="src/android/Cmd.java" target-dir="src/net/nopattern/cordova/brightcoveplayer" />
+    <source-file src="src/android/BCVideoRetriever.java" target-dir="src/net/nopattern/cordova/brightcoveplayer" />
 
     <!-- libs -->
     <framework src="src/android/brightcove-libs.gradle" custom="true" type="gradleReference" />
