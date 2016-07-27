@@ -1,4 +1,3 @@
-cordova.define("cordova-plugin-bcplayer.player", function(require, exports, module) {
 var exec = require('cordova/exec');
 
     var BrightcovePlayerPlugin = function() {
@@ -124,4 +123,3 @@ var exec = require('cordova/exec');
 
 module.exports = BrightcovePlayerPlugin;
 
-});
