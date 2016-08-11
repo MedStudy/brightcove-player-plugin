@@ -309,7 +309,7 @@ public class BCPlayerActivity extends BrightcovePlayer {
 
     final Rect rect = BCVideoRetriever.getRect();
 
-    lp.gravity = Gravity.TOP;
+    //lp.gravity = Gravity.TOP;
     if(restart.compareToIgnoreCase("yes") == 0) {
       lp.x = toPixels(context, 0);
       lp.y = toPixels(context, rect.top);
