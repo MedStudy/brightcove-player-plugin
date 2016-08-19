@@ -49,13 +49,16 @@ public class BCPlayerPlugin extends CordovaPlugin {
       Context context = this.cordova.getActivity().getApplicationContext();
       //enableComponent(context, BCPlayerActivity.class, true);
       token = args.getString(0);
-      this.init(callbackContext, "no");
+      this.init(callbackContext, "no", "no");
       return true;
     } else if (action.equals("enable")) {
-      this.init(callbackContext, "yes");
+      this.init(callbackContext, "yes", "no");
       //sendCommand(Cmd.ENABLE, "", "", "", "");
       //Context context = this.cordova.getActivity().getApplicationContext();
       //enableComponent(context, BCPlayerActivity.class, true);
+      return true;
+    } else if (action.equals("enable-from-notes")) {
+      this.init(callbackContext, "yes", "yes");
       return true;
     } else if (action.equals("disable")) {
       sendCommand(Cmd.DISABLE, "", "", "", "");
@@ -115,15 +118,20 @@ public class BCPlayerPlugin extends CordovaPlugin {
             enableFlag, PackageManager.DONT_KILL_APP);
   }
 
-  private void init(CallbackContext callbackContext, String restart) {
+  private void init(CallbackContext callbackContext, String restart, String fromNotes) {
     if (token != null && token.length() > 0){
       Context context = this.cordova.getActivity().getApplicationContext();
       Intent intent = new Intent(context, BCPlayerActivity.class);
       intent.putExtra("brightcove-token", token);
       intent.putExtra("brightcove-restart", restart);
+      intent.putExtra("brightcove-from-notes", fromNotes);
       intent.putExtra("brightcove-rid", rid);
       intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
       context.startActivity(intent);
+
+      Intent intentSerivce = new Intent(context, BCPlayerService.class);
+      intent.putExtra("brightcove-token", token);
+      context.startService(intentSerivce);
 
       callbackContext.success("Brightcove inited");
     } else{

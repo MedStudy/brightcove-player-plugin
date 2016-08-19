@@ -14,5 +14,6 @@ public enum Cmd {
     SHOW,
     SEEK,
     RATE,
+    RESUME,
     REPOSITION
 };
