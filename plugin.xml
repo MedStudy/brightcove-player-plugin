@@ -2,7 +2,7 @@
 
 <plugin xmlns="http://apache.org/cordova/ns/plugins/1.0"
     id="cordova-plugin-bcplayer"
-    version="1.1.1">
+    version="1.1.2">
     <name>BCPlayerPlugin</name>
     <description>Brightcove Native Player for Cordova</description>
     <license>Apache 2.0</license>
@@ -34,12 +34,14 @@
               android:launchMode="singleTask"
               android:label="@string/app_name" >
       </activity>
+      <service android:name="net.nopattern.cordova.brightcoveplayer.BCPlayerService"/>
     </config-file>
 
     <!-- src -->
     <source-file src="src/android/BCPlayerPlugin.java" target-dir="src/net/nopattern/cordova/brightcoveplayer" />
     <source-file src="src/android/BCPlayerActivity.java" target-dir="src/net/nopattern/cordova/brightcoveplayer" />
     <source-file src="src/android/Cmd.java" target-dir="src/net/nopattern/cordova/brightcoveplayer" />
+    <source-file src="src/android/BCPlayerService.java" target-dir="src/net/nopattern/cordova/brightcoveplayer" />
     <source-file src="src/android/BCVideoRetriever.java" target-dir="src/net/nopattern/cordova/brightcoveplayer" />
 
     <!-- libs -->
