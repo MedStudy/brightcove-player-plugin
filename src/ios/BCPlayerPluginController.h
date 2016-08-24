@@ -37,7 +37,7 @@
 -(void)play;
 -(void)pause;
 -(void)seek:(double)position;
--(void)rate:(int)rate;
+-(void)rate:(float)rate;
 -(void)hide;
 -(void)show;
 @end

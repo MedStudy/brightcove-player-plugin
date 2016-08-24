@@ -71,7 +71,7 @@
     return self.duration;
 }
 
--(void)rate:(int)rate
+-(void)rate:(float)rate
 {
     self.avpvc.player.rate = rate;
 }

@@ -149,9 +149,9 @@
     CDVPluginResult* pluginResult = nil;
 
     NSString *rateString = [command argumentAtIndex:0 withDefault:@"" andClass:[NSString class]];
-    int rate = 0;
+    float rate = 0;
     if (rateString != nil && [rateString length]) {
-        rate =[rateString intValue];
+        rate =[rateString floatValue];
     }
 
     if (rateString != nil && [rateString length]) {
