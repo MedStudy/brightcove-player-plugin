@@ -71,6 +71,7 @@ public class BCPlayerActivity extends BrightcovePlayer {
   private String token = null;
   private String restart = null;
   private String restartFromNotes = null;
+  private String resumeFromEnable = "true";
   private boolean wasPlaying = false;
   private boolean finishing = false;
 
@@ -198,6 +199,7 @@ public class BCPlayerActivity extends BrightcovePlayer {
     Intent intent = getIntent();
     token = intent.getStringExtra("brightcove-token");
     restart = intent.getStringExtra("brightcove-restart");
+    resumeFromEnable = intent.getStringExtra("brightcove-resume");
     restartFromNotes = intent.getStringExtra("brightcove-from-notes");
 
     eventEmitter = brightcoveVideoView.getEventEmitter();
@@ -422,7 +424,11 @@ public class BCPlayerActivity extends BrightcovePlayer {
   private void addVideoToViewer(Video video) {
     brightcoveVideoView.clear();
     brightcoveVideoView.add(video);
-    brightcoveVideoView.start();
+
+    if(resumeFromEnable.compareToIgnoreCase("yes") == 0){
+      brightcoveVideoView.start();
+    }
+
     return;
   }
 
