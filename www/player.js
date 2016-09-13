@@ -23,13 +23,23 @@ var exec = require('cordova/exec');
       );
     };
 
-    BrightcovePlayerPlugin.enable = function() {
+    BrightcovePlayerPlugin.enable = function(resume) {
         exec(
             successHandler,
             errorHandler,
             "BCPlayerPlugin",
             "enable",
-            []
+            [resume ? resume.toString() : 'yes']
+        );
+    };
+    
+    BrightcovePlayerPlugin.enableFromNotes = function(resume) {
+        exec(
+            successHandler,
+            errorHandler,
+            "BCPlayerPlugin",
+            "enable-from-notes",
+            [resume ? resume.toString() : 'yes']
         );
     };
 
