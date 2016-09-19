@@ -5,6 +5,7 @@
 @interface BCPlayerPlugin : CDVPlugin <BrightcovePluginViewControllerDelegate>
 
 @property BCPlayerPluginController *bCPlayerPluginController;
+@property BOOL backgroundMode;
 
 - (void)init:(CDVInvokedUrlCommand*)command;
 - (void)load:(CDVInvokedUrlCommand*)command;

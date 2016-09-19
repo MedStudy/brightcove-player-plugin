@@ -17,6 +17,8 @@
 - (void)handleEndedEvent;
 - (void)handleLoadedEvent:(NSString *)duration;
 - (void)handleLoadErrorEvent;
+- (void)handleBackgroundMode;
+- (void)handleExitBackgroundMode;
 @end
 
 @interface BCPlayerPluginController : UIViewController <BCOVPlaybackSessionConsumer, BCOVPlaybackControllerDelegate>

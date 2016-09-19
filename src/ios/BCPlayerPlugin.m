@@ -1,5 +1,7 @@
 #import "BCPlayerPlugin.h"
 
+extern id bcPluginGlobal;
+
 @implementation BCPlayerPlugin
 
 #pragma mark - Cordova Initialization
@@ -7,6 +9,8 @@
 -(CDVPlugin*) initWithWebView:(UIWebView*)theWebView
 {
     self = (BCPlayerPlugin*)[super initWithWebView:theWebView];
+    bcPluginGlobal = self;
+    _backgroundMode = false;
     return self;
 }
 
@@ -33,7 +37,24 @@
 
 - (void) handlePauseEvent
 {
+    if(_backgroundMode){
+        if(self.bCPlayerPluginController != nil){
+            [self.bCPlayerPluginController play];
+        }
+        _backgroundMode = false;
+    }
+
     [self.commandDelegate evalJs:[NSString stringWithFormat:@"cordova.fireWindowEvent('brightcovePlayer.pause', {})"]];
+}
+
+- (void) handleBackgroundMode
+{
+    _backgroundMode = true;
+}
+
+- (void) handleExitBackgroundMode
+{
+    _backgroundMode = false;
 }
 
 - (void) handleEndedEvent
