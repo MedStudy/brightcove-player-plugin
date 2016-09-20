@@ -29,6 +29,7 @@ public class BCPlayerPlugin extends CordovaPlugin {
   private PluginReceiver receiver;
   private String token = "";
   private String rid = null;
+  private boolean serviceStarted = false;
 
   static final String PLUGIN_CMD = "PLUGIN_CMD";
 
@@ -132,9 +133,12 @@ public class BCPlayerPlugin extends CordovaPlugin {
       intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
       context.startActivity(intent);
 
-      Intent intentSerivce = new Intent(context, BCPlayerService.class);
-      intent.putExtra("brightcove-token", token);
-      context.startService(intentSerivce);
+      if(serviceStarted == false) {
+        Intent intentSerivce = new Intent(context, BCPlayerService.class);
+        intent.putExtra("brightcove-token", token);
+        context.startService(intentSerivce);
+        serviceStarted = true;
+      }
 
       callbackContext.success("Brightcove inited");
     } else{
