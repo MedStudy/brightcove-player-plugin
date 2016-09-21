@@ -422,6 +422,11 @@ public class BCPlayerActivity extends BrightcovePlayer {
   }
 
   private void addVideoToViewer(Video video) {
+    int index = brightcoveVideoView.getCurrentIndex();
+    if(index != -1) {
+      brightcoveVideoView.remove(index);
+    }
+
     brightcoveVideoView.clear();
     brightcoveVideoView.add(video);
 
