@@ -50,7 +50,7 @@ public class BCPlayerPlugin extends CordovaPlugin {
       Context context = this.cordova.getActivity().getApplicationContext();
       //enableComponent(context, BCPlayerActivity.class, true);
       token = args.getString(0);
-      this.init(callbackContext, "no", "no", "true");
+      this.init(callbackContext, "no", "no", "yes");
       return true;
     } else if (action.equals("enable")) {
       String resume = args.getString(0);

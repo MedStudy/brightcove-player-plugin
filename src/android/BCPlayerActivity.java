@@ -71,7 +71,7 @@ public class BCPlayerActivity extends BrightcovePlayer {
   private String token = null;
   private String restart = null;
   private String restartFromNotes = null;
-  private String resumeFromEnable = "true";
+  private String resumeFromEnable = "yes";
   private boolean wasPlaying = false;
   private boolean finishing = false;
 
