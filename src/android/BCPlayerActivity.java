@@ -74,14 +74,15 @@ public class BCPlayerActivity extends BrightcovePlayer {
   private String resumeFromEnable = "yes";
   private boolean wasPlaying = false;
   private boolean finishing = false;
+  private Video video = null;
 
   private class ActivityReceiver extends BroadcastReceiver {
     @Override
     public void onReceive(Context arg0, Intent arg1) {
-      Video video = null;
       Cmd cmd = Cmd.valueOf(arg1.getStringExtra("EXTRA_CMD"));
       switch (cmd){
         case LOAD:
+          restart = "no";
           String rid = arg1.getStringExtra("EXTRA_DATA1");
           video = BCVideoRetriever.retrieveVideo(token, rid);
           if(video != null){
@@ -91,12 +92,14 @@ public class BCPlayerActivity extends BrightcovePlayer {
         case LOADED:
           video = BCVideoRetriever.getVideo();
           if(video != null){
+            /*
             Intent intent = new Intent();
             intent.setAction(ACTIVITY_EVENT);
             String duration = Integer.toString(video.getDuration() / 1000);
             intent.putExtra("DATA_BACK", "brightcovePlayer.loaded");
             intent.putExtra("DURATION", duration);
             sendBroadcast(intent);
+            */
             addVideoToViewer(video);
           }
           break;
@@ -240,6 +243,30 @@ public class BCPlayerActivity extends BrightcovePlayer {
       }
     });
 
+    eventEmitter.on(EventType.VIDEO_DURATION_CHANGED, new EventListener() {
+      @Override
+      public void processEvent(Event event) {
+
+        if(restart.compareToIgnoreCase("yes") == 0) {
+          Integer location = BCVideoRetriever.getLastLocation();
+          brightcoveVideoView.seekTo(location * 1000);
+          if (resumeFromEnable.compareToIgnoreCase("no") == 0) {
+            brightcoveVideoView.pause();
+          }
+        }
+        else{
+          // send this event only if it is not a restart
+          brightcoveVideoView.pause();
+          Intent intent = new Intent();
+          intent.setAction(ACTIVITY_EVENT);
+          String duration = Integer.toString(video.getDuration() / 1000);
+          intent.putExtra("DATA_BACK", "brightcovePlayer.loaded");
+          intent.putExtra("DURATION", duration);
+          sendBroadcast(intent);
+        }
+      }
+    });
+
     eventEmitter.on(EventType.DID_PLAY, new EventListener(){
       @Override
       public void processEvent(Event event) {
@@ -303,19 +330,8 @@ public class BCPlayerActivity extends BrightcovePlayer {
       Video video = BCVideoRetriever.retrieveVideo(token, rid);
       if(video != null){
         addVideoToViewer(video);
-        Integer location = BCVideoRetriever.getLastLocation();
-        brightcoveVideoView.seekTo(location * 1000);
-        /*
-        final Rect rect = BCVideoRetriever.getRect();
-        Timer myTimer = new Timer();
-        myTimer.schedule(new TimerTask() {
-          @Override
-          public void run() {
-            //reposition(rect.left, rect.top, rect.right, rect.bottom);
-            this.cancel();
-          }
-        }, 0, 1000);
-        */
+        //Integer location = BCVideoRetriever.getLastLocation();
+        //brightcoveVideoView.seekTo(location * 1000);
       }
     } else {
       sendEvent("brightcovePlayer.inited");
@@ -430,9 +446,9 @@ public class BCPlayerActivity extends BrightcovePlayer {
     brightcoveVideoView.clear();
     brightcoveVideoView.add(video);
 
-    if(resumeFromEnable.compareToIgnoreCase("yes") == 0){
+    //if(resumeFromEnable.compareToIgnoreCase("yes") == 0){
       brightcoveVideoView.start();
-    }
+    //}
 
     return;
   }
