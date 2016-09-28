@@ -42,6 +42,7 @@
     self.playbackController.view.frame = viewRect;
     [_parentView addSubview: self.playbackController.view];
 
+    _playRate = 1;
     return self;
 }
 
@@ -154,6 +155,10 @@
 - (void)playbackController:(id<BCOVPlaybackController>)controller playbackSession:(id<BCOVPlaybackSession>)session didProgressTo:(NSTimeInterval)progress
 {
     self.currentTime = [NSString stringWithFormat:@"%f", (float)progress];
+    if(_playRate != self.avpvc.player.rate){
+        _playRate = self.avpvc.player.rate;
+        [_delegate handleRateEvent:[NSString stringWithFormat:@"%f", (float)_playRate]];
+    }
     [_delegate handleProgressEvent:self.currentTime];
 }
 

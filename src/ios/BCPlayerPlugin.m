@@ -35,6 +35,12 @@ extern id bcPluginGlobal;
     [self.commandDelegate evalJs:[NSString stringWithFormat:@"cordova.fireWindowEvent('brightcovePlayer.progress', {'currentTime': %@})", currentTime]];
 }
 
+- (void) handleRateEvent:(NSString*)rate
+{
+
+    [self.commandDelegate evalJs:[NSString stringWithFormat:@"cordova.fireWindowEvent('brightcovePlayer.rate', {'rate': %@})", rate]];
+}
+
 - (void) handlePauseEvent
 {
     if(_backgroundMode){

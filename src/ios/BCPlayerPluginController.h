@@ -19,6 +19,7 @@
 - (void)handleLoadErrorEvent;
 - (void)handleBackgroundMode;
 - (void)handleExitBackgroundMode;
+- (void)handleRateEvent:(NSString *)rate;
 @end
 
 @interface BCPlayerPluginController : UIViewController <BCOVPlaybackSessionConsumer, BCOVPlaybackControllerDelegate>
@@ -32,6 +33,7 @@
 @property NSString *duration;
 @property NSString *currentTime;
 @property BOOL isLoaded;
+@property float playRate;
 
 -(BCPlayerPluginController*)initWithToken:(UIView*)pluginView Token:(NSString*)token;
 -(void)load:(NSString*)refId;
