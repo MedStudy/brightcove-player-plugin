@@ -75,6 +75,7 @@ public class BCPlayerActivity extends BrightcovePlayer {
   private boolean wasPlaying = false;
   private boolean finishing = false;
   private Video video = null;
+  private boolean isFullscreen = false;
 
   private class ActivityReceiver extends BroadcastReceiver {
     @Override
@@ -168,10 +169,22 @@ public class BCPlayerActivity extends BrightcovePlayer {
 
       Rect rect;
       lp.gravity = Gravity.TOP;
+
+      if(isFullscreen) {
+        DisplayMetrics metrics = new DisplayMetrics();
+        getWindowManager().getDefaultDisplay().getMetrics(metrics);
+        lp.x = 0;
+        lp.y = 0;
+        lp.width = metrics.widthPixels;
+        lp.height = metrics.heightPixels;
+      }
+      else{
       lp.x = toPixels(context, x);
       lp.y = toPixels(context, y);
       lp.width = toPixels(context, width);
       lp.height = toPixels(context, height);
+      }
+
       getWindowManager().updateViewLayout(view, lp);
       Log.d(TAG, "Height: -->" + height);
       Log.d(TAG, "Width: -->" + width);
@@ -182,7 +195,7 @@ public class BCPlayerActivity extends BrightcovePlayer {
   protected void onCreate(Bundle savedInstanceState) {
     Window window = getWindow();
     requestWindowFeature(Window.FEATURE_NO_TITLE);
-    setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
+    //setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
     setContentView(this.getIdFromResources(BRIGHTCOVE_ACTIVITY, LAYOUT));
     window.setFlags(WindowManager.LayoutParams.FLAG_NOT_TOUCH_MODAL, WindowManager.LayoutParams.FLAG_NOT_TOUCH_MODAL);
 
@@ -209,6 +222,9 @@ public class BCPlayerActivity extends BrightcovePlayer {
     eventEmitter.on(EventType.DID_ENTER_FULL_SCREEN, new EventListener() {
       @Override
       public void processEvent(Event event) {
+        isFullscreen = true;
+        sendEvent("brightcovePlayer.enterFullscreen");
+
         DisplayMetrics metrics = new DisplayMetrics();
         getWindowManager().getDefaultDisplay().getMetrics(metrics);
         final View view = getWindow().getDecorView();
@@ -231,6 +247,9 @@ public class BCPlayerActivity extends BrightcovePlayer {
     eventEmitter.on(EventType.DID_EXIT_FULL_SCREEN, new EventListener() {
       @Override
       public void processEvent(Event event) {
+        isFullscreen = false;
+        sendEvent("brightcovePlayer.exitFullscreen");
+
         //reposition(layoutX, layoutY, layoutWidth, layoutHeight);
         final View view = getWindow().getDecorView();
         WindowManager.LayoutParams lp = (WindowManager.LayoutParams) view.getLayoutParams();
@@ -391,15 +410,16 @@ public class BCPlayerActivity extends BrightcovePlayer {
 
   @Override
   protected void onDestroy() {
-    Intent intent = new Intent();
-    intent.setAction(ACTIVITY_EVENT);
+    if(brightcoveVideoView != null) {
+      brightcoveVideoView.pause();
 
-    String position = Float.toString((float)brightcoveVideoView.getCurrentPosition() / 1000);
+      int index = brightcoveVideoView.getCurrentIndex();
+      if (index != -1) {
+        brightcoveVideoView.remove(index);
+      }
 
-    intent.putExtra("DATA_BACK", "brightcovePlayer.hide");
-    intent.putExtra("POSITION", position);
-
-    sendBroadcast(intent);
+      brightcoveVideoView.clear();
+    }
 
     Log.d(TAG, "Activity destroyed");
 
