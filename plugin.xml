@@ -30,7 +30,6 @@
               android:theme="@style/AppThemeTransparent"
               android:name="net.nopattern.cordova.brightcoveplayer.BCPlayerActivity"
               android:configChanges="orientation|screenSize"
-              android:screenOrientation="landscape"
               android:launchMode="singleTask"
               android:label="@string/app_name" >
       </activity>
