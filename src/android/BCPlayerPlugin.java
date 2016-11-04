@@ -152,7 +152,8 @@ public class BCPlayerPlugin extends CordovaPlugin {
       String orgData = arg1.getStringExtra("DATA_BACK");
       String duration = arg1.getStringExtra("DURATION");
       String position = arg1.getStringExtra("POSITION");
-      appView.sendJavascript("cordova.fireWindowEvent('" + orgData + "', { 'duration':" + duration + ", 'currentTime': " + position + "})");
+      String playing = arg1.getStringExtra("PLAYING");
+      appView.sendJavascript("cordova.fireWindowEvent('" + orgData + "', { 'playing':" + playing + ", 'duration':" + duration + ", 'currentTime': " + position + "})");
     }
   }
 }

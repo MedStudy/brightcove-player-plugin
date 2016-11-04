@@ -437,6 +437,12 @@ public class BCPlayerActivity extends BrightcovePlayer {
         intent.putExtra("SERVICE_CMD", "SVC_PLAY");
         sendBroadcast(intent);
       }
+
+      Intent intent = new Intent();
+      intent.setAction(ACTIVITY_EVENT);
+      intent.putExtra("DATA_BACK", "brightcovePlayer.playing");
+      intent.putExtra("PLAYING", Boolean.toString(wasPlaying));
+      sendBroadcast(intent);
     }
   }
 
