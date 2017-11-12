@@ -142,13 +142,13 @@ extern id bcPluginGlobal;
 - (void)load:(CDVInvokedUrlCommand*)command
 {
     CDVPluginResult* pluginResult = nil;
-
-    NSString *refId = [command argumentAtIndex:0 withDefault:@"" andClass:[NSString class]];
-    if (refId != nil && [refId length]) {
-        [self.bCPlayerPluginController load:refId];
+    
+    NSString *url = [command argumentAtIndex:0 withDefault:@"" andClass:[NSString class]];
+    if (url != nil && [url length]) {
+        [self.bCPlayerPluginController load:url];
         pluginResult = [CDVPluginResult resultWithStatus:CDVCommandStatus_OK messageAsString:@"ok"];
     }
-
+    
     [self.commandDelegate sendPluginResult:pluginResult callbackId:command.callbackId];
 }
 

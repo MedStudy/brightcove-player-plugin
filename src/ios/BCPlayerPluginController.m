@@ -82,25 +82,26 @@
     return self.currentTime;
 }
 
--(void)load:(NSString*)refId
+-(void)load:(NSString*)urlString
 {
     self.duration = @"0";
     self.isLoaded = false;
+    
+    NSURL *url = [NSURL URLWithString:urlString];
+    BCOVSource *vSource = [[BCOVSource alloc] initWithURL:url];
+    BCOVVideo *video = [[BCOVVideo alloc] initWithSource:vSource cuePoints:nil properties:nil];
 
-    BCOVCatalogService *catalogService = [[BCOVCatalogService alloc] initWithToken:self.token];
-    [catalogService findVideoWithReferenceID:refId parameters:nil completion:^(BCOVVideo *video, NSDictionary *jsonResponse, NSError *error) {
-        if (video)
-        {
-            NSMutableArray *videoArray = [NSMutableArray arrayWithCapacity:1];
-            [videoArray addObject:video];
-            [self.playbackController setVideos:videoArray];
-        }
-        else
-        {
-            NSLog(@"BrightcovePluginViewController Debug - Error retrieving video: %@", error);
-            [_delegate handleLoadErrorEvent];
-        }
-    }];
+    if (video)
+    {
+        NSMutableArray *videoArray = [NSMutableArray arrayWithCapacity:1];
+        [videoArray addObject:video];
+        [self.playbackController setVideos:videoArray];
+    }
+    else
+    {
+        NSLog(@"BrightcovePluginViewController Debug - Error creating video object");
+        [_delegate handleLoadErrorEvent];
+    }
 }
 
 -(void)seek:(double)position
@@ -142,7 +143,7 @@
         NSLog(@"BrightcovePluginViewController Debug - kBCOVPlaybackSessionLifecycleEventEnd");
         [_delegate handleEndedEvent];
     }
-    else if ([type isEqualToString:kBCOVPlaybackSessionLifecycleEventError]){
+    else if ([type isEqualToString:kBCOVPlaybackSessionLifecycleEventError] || [type isEqualToString:kBCOVPlaybackSessionLifecycleEventFail]){
         NSLog(@"BrightcovePluginViewController Debug - kBCOVPlaybackSessionLifecycleEventError");
         [_delegate handleErrorEvent];
     }

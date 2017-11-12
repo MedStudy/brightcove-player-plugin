@@ -76,6 +76,7 @@ public class BCPlayerActivity extends BrightcovePlayer {
   private boolean finishing = false;
   private Video video = null;
   private boolean isFullscreen = false;
+  private boolean durationReported = false;
 
   private class ActivityReceiver extends BroadcastReceiver {
     @Override
@@ -83,9 +84,10 @@ public class BCPlayerActivity extends BrightcovePlayer {
       Cmd cmd = Cmd.valueOf(arg1.getStringExtra("EXTRA_CMD"));
       switch (cmd){
         case LOAD:
+          durationReported = false;
           restart = "no";
-          String rid = arg1.getStringExtra("EXTRA_DATA1");
-          video = BCVideoRetriever.retrieveVideo(token, rid);
+          String url = arg1.getStringExtra("EXTRA_DATA1");
+          video = BCVideoRetriever.retrieveVideo(token, url);
           if(video != null){
             addVideoToViewer(video);
           }
@@ -278,10 +280,11 @@ public class BCPlayerActivity extends BrightcovePlayer {
           brightcoveVideoView.pause();
           Intent intent = new Intent();
           intent.setAction(ACTIVITY_EVENT);
-          String duration = Integer.toString(video.getDuration() / 1000);
-          intent.putExtra("DATA_BACK", "brightcovePlayer.loaded");
-          intent.putExtra("DURATION", duration);
-          sendBroadcast(intent);
+//            String duration = Integer.toString(brightcoveVideoView.getDuration() / 1000);
+            intent.putExtra("DATA_BACK", "brightcovePlayer.loaded");
+            intent.putExtra("DURATION", "10000");
+            sendBroadcast(intent);
+            durationReported = true;
         }
       }
     });
@@ -326,6 +329,16 @@ public class BCPlayerActivity extends BrightcovePlayer {
         intent.putExtra("POSITION", position);
         sendBroadcast(intent);
 
+        if(durationReported == false) {
+          if(brightcoveVideoView.getDuration() > 0) {
+            String duration = Float.toString((float) brightcoveVideoView.getDuration() / 1000);
+            intent.putExtra("DATA_BACK", "brightcovePlayer.loaded");
+            intent.putExtra("DURATION", duration);
+            sendBroadcast(intent);
+            durationReported = true;
+          }
+        }
+
         Log.d("Time Pos: ", position);
       }
     });
@@ -344,9 +357,23 @@ public class BCPlayerActivity extends BrightcovePlayer {
       }
     });
 
+    eventEmitter.on(EventType.SOURCE_NOT_PLAYABLE, new EventListener(){
+      @Override
+      public void processEvent(Event event) {
+        sendEvent("brightcovePlayer.error");
+      }
+    });
+
+    eventEmitter.on(EventType.SOURCE_NOT_FOUND, new EventListener(){
+      @Override
+      public void processEvent(Event event) {
+        sendEvent("brightcovePlayer.error");
+      }
+    });
+
     if(restart.compareToIgnoreCase("yes") == 0){
-      String rid = intent.getStringExtra("brightcove-rid");
-      Video video = BCVideoRetriever.retrieveVideo(token, rid);
+      String url = intent.getStringExtra("brightcove-url");
+      Video video = BCVideoRetriever.retrieveVideo(token, url);
       if(video != null){
         addVideoToViewer(video);
         //Integer location = BCVideoRetriever.getLastLocation();

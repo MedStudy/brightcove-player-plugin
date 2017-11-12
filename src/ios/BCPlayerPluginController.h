@@ -36,7 +36,7 @@
 @property float playRate;
 
 -(BCPlayerPluginController*)initWithToken:(UIView*)pluginView Token:(NSString*)token;
--(void)load:(NSString*)refId;
+-(void)load:(NSString*)url;
 -(void)reposition:(CGRect)viewRect;
 -(void)play;
 -(void)pause;

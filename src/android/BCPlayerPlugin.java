@@ -28,7 +28,7 @@ public class BCPlayerPlugin extends CordovaPlugin {
   private CordovaWebView appView;
   private PluginReceiver receiver;
   private String token = "";
-  private String rid = null;
+  private String url = null;
   private boolean serviceStarted = false;
 
   static final String PLUGIN_CMD = "PLUGIN_CMD";
@@ -69,8 +69,8 @@ public class BCPlayerPlugin extends CordovaPlugin {
       //enableComponent(context, BCPlayerActivity.class, false);
       return true;
     } else if (action.equals("load")) {
-      rid = args.getString(0);
-      sendCommand(Cmd.LOAD, rid, "", "", "");
+      url = args.getString(0);
+      sendCommand(Cmd.LOAD, url, "", "", "");
       return true;
     } else if (action.equals("hide")) {
       sendCommand(Cmd.HIDE, "", "", "", "");
@@ -128,7 +128,7 @@ public class BCPlayerPlugin extends CordovaPlugin {
       intent.putExtra("brightcove-token", token);
       intent.putExtra("brightcove-restart", restart);
       intent.putExtra("brightcove-from-notes", fromNotes);
-      intent.putExtra("brightcove-rid", rid);
+      intent.putExtra("brightcove-url", url);
       intent.putExtra("brightcove-resume", resume);
       intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
       context.startActivity(intent);

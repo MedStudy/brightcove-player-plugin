@@ -70,7 +70,14 @@ public class BCVideoRetriever {
         return videoCurrent;
     }
 
-    public static Video retrieveVideo(final String token, final String rid){
+    public static Video retrieveVideo(final String token, final String url) {
+        Video video = Video.createVideo(url);
+        videoCurrent = video;
+        ridCurrent = url;
+        return  video;
+    }
+
+    public static Video retrieveVideoBrightcove(final String token, final String rid){
         Video video = null;
         if(ridCurrent.compareToIgnoreCase(rid) != 0) {
             Catalog catalog = new Catalog(token);

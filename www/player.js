@@ -13,13 +13,13 @@ var exec = require('cordova/exec');
         );
     };
 
-    BrightcovePlayerPlugin.load = function(id) {
+    BrightcovePlayerPlugin.load = function(url) {
       exec(
         successHandler,
         errorHandler,
         "BCPlayerPlugin",
         "load",
-        [id ? id.toString() : null]
+        [url ? url.toString() : null]
       );
     };
 
